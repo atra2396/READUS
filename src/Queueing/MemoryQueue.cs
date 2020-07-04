@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,11 @@ namespace Queueing
             this.queue = new List<TMessageType>();
         }
 
+        public bool HasMessages()
+        {
+            return this.queue.Any();
+        }
+
         public TMessageType PopMessage()
         {
             var message = this.queue[0];
@@ -24,6 +30,7 @@ namespace Queueing
         public void PushMessage(TMessageType message)
         {
             this.queue.Add(message);
+
         }
     }
 }

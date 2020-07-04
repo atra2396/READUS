@@ -7,5 +7,7 @@ namespace Queueing
     {
         void PushMessage(TMessageType message);
         TMessageType PopMessage();
+
+        bool HasMessages();
     }
 }
