@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Storage
 {
-    public interface IDataRepository<T> where T : IDomainObject
+    public interface IDataRepository<T> where T : IEntity
     {
         T Get(Guid id);
         IEnumerable<T> GetWhere(Expression<Func<T, bool>> func);

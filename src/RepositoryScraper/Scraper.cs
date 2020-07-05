@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DomainObjects;
+using Queueing.Messages;
+using Storage;
+using System;
+using System.Threading.Tasks;
 
 namespace RepositoryScraper
 {
@@ -9,12 +13,20 @@ namespace RepositoryScraper
         ///     - Walk the repository that changed
         ///     - Check if the readmes are the same (hash them or something)
         ///     - Update changes in the DB
-        
-        public Scraper()
+
+        private DataContext db;
+        // private SourceControl scm;
+
+
+        public Scraper(DataContext db)
         {
-            // IDataStore
+            this.db = db;
         }
 
+        public void ScrapeRepository(RepositoryUpdatedMessage msg)
+        {
+            var repoToUpdate = 
+        }
 
     }
 }

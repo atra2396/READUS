@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DomainObjects
 {
-    public interface IDomainObject
+    public interface IEntity
     {
         Guid Id { get; set; }
         DateTime Created { get; set; }

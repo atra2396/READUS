@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DomainObjects
 {
-    public class Document : IDomainObject
+    public class Document : IEntity
     {
 
         public Guid Id { get; set; }

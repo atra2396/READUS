@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Storage
 {
-    public class MemoryRepository<T> : IDataRepository<T> where T : IDomainObject
+    public class MemoryRepository<T> : IDataRepository<T> where T : IEntity
     {
         Dictionary<Guid, T> db;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DomainObjects
 {
-    public class Repository : IDomainObject
+    public class Repository : IEntity
     {
         public Guid Id { get; set; }
         public DateTime Created { get; set; }
