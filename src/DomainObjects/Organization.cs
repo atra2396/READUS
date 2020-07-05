@@ -4,17 +4,16 @@ using System.Text;
 
 namespace DomainObjects
 {
-    public class Organization
+    public class Organization : IDomainObject
     {
-        public Organization(Guid id, string name, IEnumerable<Repository> repositories)
-        {
-            this.Id = id;
-            this.Name = name;
-            this.Repositories = repositories;
-        }
+        public Guid Id { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
 
-        public Guid Id { get; }
-        public string Name { get; }
-        public IEnumerable<Repository> Repositories { get; }
+        // The Id given by the source, for example "SubscriptionId" from Azure DevOps
+        public string SourceId { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<Repository> Repositories { get; set; }
+
     }
 }
