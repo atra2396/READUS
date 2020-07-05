@@ -25,7 +25,6 @@ namespace RepositoryScraper
 
         public void ScrapeRepository(RepositoryUpdatedMessage msg)
         {
-            var repoToUpdate = 
         }
 
     }
