@@ -11,6 +11,10 @@ namespace DomainObjects
 
         public Guid OrganizationId { get; set; }
         public string Name { get; set; }
+
+        // uri generally, or a path for local testing?
+        public string RootLocation { get; set; }
+
         public IEnumerable<Document> Documents { get; }
     }
 }
