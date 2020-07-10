@@ -12,8 +12,9 @@ namespace DomainObjects
         public Guid OrganizationId { get; set; }
         public string Name { get; set; }
 
-        // uri generally, or a path for local testing?
-        public string RootLocation { get; set; }
+        // auth, uri, etc... whatever the SCM needs, stored as an encrypted json
+        public string CustomRepositoryInformation { get; set; }
+        public SupportedSystems SCM { get; set; }
 
         public IEnumerable<Document> Documents { get; }
     }

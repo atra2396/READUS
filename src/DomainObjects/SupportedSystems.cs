@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace SourceControl
+namespace DomainObjects
 {
     public enum SupportedSystems
     {
         Unknown,
-        Local,
+        Memory,
         // GitHub,
         // AzureDevOps
     }

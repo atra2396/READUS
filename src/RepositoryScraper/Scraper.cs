@@ -2,6 +2,7 @@
 using Queueing.Messages;
 using Storage;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RepositoryScraper
@@ -15,7 +16,6 @@ namespace RepositoryScraper
         ///     - Update changes in the DB
 
         private DataContext db;
-        // private SourceControl scm;
 
 
         public Scraper(DataContext db)
@@ -25,6 +25,31 @@ namespace RepositoryScraper
 
         public void ScrapeRepository(RepositoryUpdatedMessage msg)
         {
+            var repo = db.Repositories.Get(msg.RepositoryId);
+
+            var scm = SourceControlFactory.GetSourceControlAccessor(repo.SCM);
+            var documents = scm.GetReadmes(repo);
+
+            var documentPathLookup = db.Documents.GetWhere(x => x.RepositoryId == repo.Id)
+                .ToDictionary(x => x.Path, x => x.Id);
+
+            foreach(var document in documents)
+            {
+                // There can only be one README.md per directory, so I'm hoping we can count on this check to
+                // always be true and keep things simple...
+                //
+                // ...but I'm positive that'll blow up in my face now that I've said it.
+                // There is surely a more efficient way anyways, at least for other SCM APIs
+                if (documentPathLookup.ContainsKey(document.Path))
+                {
+                    document.Id = documentPathLookup[document.Path];
+                    db.Documents.Update(document);
+                }
+                else
+                {
+                    db.Documents.Add(document);
+                }
+            }
         }
 
     }
