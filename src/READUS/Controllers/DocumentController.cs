@@ -12,6 +12,8 @@ namespace READUS.Controllers
     [Route("api/[controller]")]
     public class DocumentController : Controller
     {
+        public DocumentController()
+
         // GET: api/<controller>
         [HttpGet]
         public IEnumerable<string> Get()

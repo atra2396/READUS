@@ -15,10 +15,10 @@ namespace RepositoryScraper
         ///     - Check if the readmes are the same (hash them or something)
         ///     - Update changes in the DB
 
-        private DataContext db;
+        private IDataContext db;
 
 
-        public Scraper(DataContext db)
+        public Scraper(IDataContext db)
         {
             this.db = db;
         }
