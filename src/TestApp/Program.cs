@@ -43,7 +43,7 @@ namespace TestApp
 
             repos.Add(newRepo);
 
-            var db = new DataContext(docs, orgs, repos);
+            var db = new MemoryDataContext(docs, orgs, repos);
 
             var queue = new MemoryQueue<RepositoryUpdatedMessage>();
 
@@ -61,7 +61,7 @@ namespace TestApp
 
         }
 
-        private static void Display(DataContext ctx)
+        private static void Display(IDataContext ctx)
         {
             Console.WriteLine($"Documents at {DateTime.Now}:");
             foreach(var doc in ctx.Documents.GetWhere(x => true))

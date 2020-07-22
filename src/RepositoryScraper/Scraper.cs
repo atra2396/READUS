@@ -15,17 +15,17 @@ namespace RepositoryScraper
         ///     - Check if the readmes are the same (hash them or something)
         ///     - Update changes in the DB
 
-        private DataContext db;
+        private IDataContext db;
 
 
-        public Scraper(DataContext db)
+        public Scraper(IDataContext db)
         {
             this.db = db;
         }
 
         public void ScrapeRepository(RepositoryUpdatedMessage msg)
         {
-            var repo = db.Repositories.Get(msg.RepositoryId);
+            var repo = db.Repositories.GetById(msg.RepositoryId);
 
             var scm = SourceControlFactory.GetSourceControlAccessor(repo.SCM);
             var documents = scm.GetReadmes(repo);

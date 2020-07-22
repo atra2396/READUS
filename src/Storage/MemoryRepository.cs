@@ -23,14 +23,16 @@ namespace Storage
             this.db.Add(entity.Id, entity);
         }
 
-        public void Delete(T entity)
+        public void Delete(Guid id)
         {
-            this.db.Remove(entity.Id);
+            this.db.Remove(id);
         }
 
-        public T Get(Guid id)
+        public T GetById(Guid id)
         {
-            return this.db[id];
+            if (this.db.ContainsKey(id))
+                return this.db[id];
+            return default;
         }
 
         public IEnumerable<T> GetWhere(Expression<Func<T, bool>> func)
@@ -39,12 +41,15 @@ namespace Storage
             return this.db.Values.Where(predicate);
         }
 
-        public void Update(T entity)
+        public T Update(T entity)
         {
             if (this.db.ContainsKey(entity.Id))
+            {
                 this.db[entity.Id] = entity;
+                return entity;
+            }
             else
-                throw new KeyNotFoundException($"Entity {entity.Id} does not exist!");
+                return default;
         }
     }
 }
