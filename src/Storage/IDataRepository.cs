@@ -8,10 +8,10 @@ namespace Storage
 {
     public interface IDataRepository<T> where T : IEntity
     {
-        T Get(Guid id);
+        T GetById(Guid id);
         IEnumerable<T> GetWhere(Expression<Func<T, bool>> func);
         void Add(T entity);
         void Update(T entity);
-        void Delete(T entity);
+        void Delete(Guid id);
     }
 }

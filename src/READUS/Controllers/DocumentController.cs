@@ -26,8 +26,7 @@ namespace READUS.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(Guid id)
         {
-            var doc = this.dataContext.Documents.Get(id);
-
+            var doc = this.dataContext.Documents.GetById(id);
             if (doc == null)
                 return NotFound();
 
@@ -61,11 +60,11 @@ namespace READUS.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-            var doc = this.dataContext.Documents.Get(id);
+            var doc = this.dataContext.Documents.GetById(id);
             if (doc == null)
                 return NotFound();
 
-            this.dataContext.Documents.Delete(doc);
+            this.dataContext.Documents.Delete(id);
             return Ok();
         }
     }

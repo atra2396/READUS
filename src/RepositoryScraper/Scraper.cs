@@ -25,7 +25,7 @@ namespace RepositoryScraper
 
         public void ScrapeRepository(RepositoryUpdatedMessage msg)
         {
-            var repo = db.Repositories.Get(msg.RepositoryId);
+            var repo = db.Repositories.GetById(msg.RepositoryId);
 
             var scm = SourceControlFactory.GetSourceControlAccessor(repo.SCM);
             var documents = scm.GetReadmes(repo);

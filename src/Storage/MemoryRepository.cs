@@ -23,12 +23,12 @@ namespace Storage
             this.db.Add(entity.Id, entity);
         }
 
-        public void Delete(T entity)
+        public void Delete(Guid id)
         {
-            this.db.Remove(entity.Id);
+            this.db.Remove(id);
         }
 
-        public T Get(Guid id)
+        public T GetById(Guid id)
         {
             return this.db[id];
         }
