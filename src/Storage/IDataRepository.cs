@@ -11,7 +11,7 @@ namespace Storage
         T GetById(Guid id);
         IEnumerable<T> GetWhere(Expression<Func<T, bool>> func);
         void Add(T entity);
-        void Update(T entity);
+        T Update(T entity);
         void Delete(Guid id);
     }
 }

@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DomainObjects\DomainObjects.csproj" />
+    <ProjectReference Include="..\SourceControl\SourceControl.csproj" />
     <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
 

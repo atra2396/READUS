@@ -1,3 +1,4 @@
+using DomainObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +6,10 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using SourceControl.InMemory;
+using Storage;
+using System;
 
 namespace READUS
 {
@@ -20,6 +25,8 @@ namespace READUS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // if in dev
+            services.AddSingleton<IDataContext, MemoryDataContext>(service => CreateMockdataContext());
 
             services.AddControllersWithViews();
 
@@ -66,6 +73,40 @@ namespace READUS
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private MemoryDataContext CreateMockdataContext()
+        {
+            var docs = new MemoryRepository<Document>();
+            var repos = new MemoryRepository<Repository>();
+            var orgs = new MemoryRepository<Organization>();
+
+            var newOrg = new Organization()
+            {
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                Name = "Test Org",
+            };
+            orgs.Add(newOrg);
+
+            var repoData = new MemoryMetadata()
+            {
+                HasPassword = true,
+                Password = "Pa$$w0rd",
+                RootDirectory = @"C:\Users\alija\Documents\Programming\Test%20Project"
+            };
+
+            var newRepo = new Repository()
+            {
+                Name = "Test Repo",
+                OrganizationId = newOrg.Id,
+                SCM = SupportedSystems.Memory,
+                CustomRepositoryInformation = JsonConvert.SerializeObject(repoData)
+            };
+
+            repos.Add(newRepo);
+
+            return new MemoryDataContext(docs, orgs, repos);
         }
     }
 }
