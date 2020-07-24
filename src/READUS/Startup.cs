@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using READUS.Middleware;
 using SourceControl.InMemory;
 using Storage;
 using System;
@@ -52,26 +53,16 @@ namespace READUS
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
 
             app.UseRouting();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
             });
         }
 
@@ -80,6 +71,7 @@ namespace READUS
             var docs = new MemoryRepository<Document>();
             var repos = new MemoryRepository<Repository>();
             var orgs = new MemoryRepository<Organization>();
+            var users = new MemoryRepository<User>();
 
             var newOrg = new Organization()
             {
@@ -106,7 +98,15 @@ namespace READUS
 
             repos.Add(newRepo);
 
-            return new MemoryDataContext(docs, orgs, repos);
+            var newUser = new User()
+            {
+                Username = "agreen",
+                Password = "password"
+            };
+
+            users.Add(newUser);
+
+            return new MemoryDataContext(docs, orgs, repos, users);
         }
     }
 }

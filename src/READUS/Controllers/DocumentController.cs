@@ -21,6 +21,13 @@ namespace READUS.Controllers
             this.dataContext = dataContext;
         }
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var docs = this.dataContext.Documents.GetWhere(x => true);
+            return Ok(docs);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

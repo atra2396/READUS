@@ -7,5 +7,6 @@ namespace Storage
         IDataRepository<Document> Documents { get; }
         IDataRepository<Organization> Organizations { get; }
         IDataRepository<Repository> Repositories { get; }
+        IDataRepository<User> Users { get; }
     }
 }
