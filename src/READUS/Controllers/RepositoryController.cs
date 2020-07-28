@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DomainObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Storage;
@@ -11,6 +12,7 @@ using Storage;
 
 namespace READUS.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class RepositoryController : ControllerBase
     {

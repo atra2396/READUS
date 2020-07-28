@@ -59,7 +59,7 @@ namespace READUS.Controllers
         private string GenerateJwt(User user)
         {
             var jwtHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("this is the key for now");
+            var key = Encoding.ASCII.GetBytes("this is the key that I will use for development");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),

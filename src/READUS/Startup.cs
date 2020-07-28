@@ -1,4 +1,5 @@
 using DomainObjects;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,16 +7,21 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using READUS.Middleware;
 using SourceControl.InMemory;
 using Storage;
 using System;
+using System.Text;
 
 namespace READUS
 {
     public class Startup
     {
+
+        const string SUPER_SECURE_KEY = "this is the key that I will use for development";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,6 +36,25 @@ namespace READUS
             services.AddSingleton<IDataContext, MemoryDataContext>(service => CreateMockdataContext());
 
             services.AddControllersWithViews();
+
+            services.AddAuthentication(x => 
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SUPER_SECURE_KEY)),
+                    ValidateIssuer = false, // false for development
+                    ValidateAudience = false, // false for development
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -56,7 +81,8 @@ namespace READUS
 
             app.UseRouting();
 
-            app.UseMiddleware<JwtMiddleware>();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
