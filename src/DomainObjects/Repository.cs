@@ -6,11 +6,14 @@ namespace DomainObjects
     public class Repository : IEntity
     {
         public Guid Id { get; set; }
+        public string Name { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
         public Guid OrganizationId { get; set; }
-        public string Name { get; set; }
+        public string OrganizationName { get; set; }
+        public string ProjectId { get; set; }
+        public string ProjectName { get; set; }
 
         // auth, uri, etc... whatever the SCM needs, stored as an encrypted json
         public string CustomRepositoryInformation { get; set; }

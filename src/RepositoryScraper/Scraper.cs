@@ -23,12 +23,12 @@ namespace RepositoryScraper
             this.db = db;
         }
 
-        public void ScrapeRepository(RepositoryUpdatedMessage msg)
+        public async Task ScrapeRepository(RepositoryUpdatedMessage msg)
         {
             var repo = db.Repositories.GetById(msg.RepositoryId);
 
             var scm = SourceControlFactory.GetSourceControlAccessor(repo.SCM);
-            var documents = scm.GetReadmes(repo);
+            var documents = await scm.GetReadmes(repo);
 
             var documentPathLookup = db.Documents.GetWhere(x => x.RepositoryId == repo.Id)
                 .ToDictionary(x => x.Path, x => x.Id);
