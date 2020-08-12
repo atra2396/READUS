@@ -7,6 +7,7 @@ namespace DomainObjects
         Unknown,
         Memory,
         AzureDevOps,
+        GitHub,
         // GitHub,
     }
 }

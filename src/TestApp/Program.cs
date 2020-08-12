@@ -4,6 +4,7 @@ using Queueing;
 using Queueing.Messages;
 using RepositoryScraper;
 using SourceControl.AzureDevOps;
+using SourceControl.GitHub;
 using SourceControl.InMemory;
 using Storage;
 using System;
@@ -30,7 +31,7 @@ namespace TestApp
             {
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
-                Name = "zhekau",
+                Name = "evuru",
             };
             orgs.Add(newOrg);
 
@@ -43,9 +44,9 @@ namespace TestApp
 
             //In AzureDevops, the hierarchy is as follows:
             //Organization -> Project -> Repo -> Items
-            var metadata = new AzureDevOpsMetadata
+            var metadata = new GitHubMetadata
             {
-                PersonalAccessToken = "{YOUR PAT}",
+                PersonalAccessToken = "",
             };
 
             var newRepo = new Repository()
@@ -54,7 +55,7 @@ namespace TestApp
                 OrganizationId = newOrg.Id,
                 OrganizationName = newOrg.Name,
                 ProjectName = "{YOUR PROJECT NAME}",
-                SCM = SupportedSystems.AzureDevOps,
+                SCM = SupportedSystems.GitHub,
                 CustomRepositoryInformation = JsonConvert.SerializeObject(metadata)
             };
 
