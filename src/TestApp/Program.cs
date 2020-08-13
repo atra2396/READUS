@@ -34,26 +34,15 @@ namespace TestApp
             };
             orgs.Add(newOrg);
 
-            var repoData = new MemoryMetadata()
-            {
-                HasPassword = true,
-                Password = "Pa$$w0rd",
-                RootDirectory = @"C:\Users\alija\Documents\Programming\Test%20Project",
-            };
-
-            //In AzureDevops, the hierarchy is as follows:
-            //Organization -> Project -> Repo -> Items
             var metadata = new AzureDevOpsMetadata
             {
-                PersonalAccessToken = "{YOUR PAT}",
+                PersonalAccessToken = "dqqom4g5tcepdzkqs3xlzaoach3l7iljvwd2cdvftcieydlullyq",
             };
 
             var newRepo = new Repository()
             {
-                Name = "Test Repo",
+                Name = newOrg.Name,
                 OrganizationId = newOrg.Id,
-                OrganizationName = newOrg.Name,
-                ProjectName = "{YOUR PROJECT NAME}",
                 SCM = SupportedSystems.AzureDevOps,
                 CustomRepositoryInformation = JsonConvert.SerializeObject(metadata)
             };
