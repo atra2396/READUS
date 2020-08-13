@@ -23,7 +23,7 @@ namespace SourceControl.AzureDevOps
             List<Task<IEnumerable<AzureDevOpsRepository>>> GetRepositoriesTasks = new List<Task<IEnumerable<AzureDevOpsRepository>>>();
 
             foreach (var proj in orgProjects)
-                GetRepositoriesTasks.Add(GetRepositoriesFromProject(repository, proj, metadata.PersonalAccessToken));
+                GetRepositoriesTasks.Add(GetRepositoriesFromProject(repository, proj, metadata));
 
             var repositoriesResult = await Task.WhenAll(GetRepositoriesTasks.ToArray());
 
@@ -43,19 +43,19 @@ namespace SourceControl.AzureDevOps
             return readmeDocuments.SelectMany(x => x);
         }
 
-        private async Task<IEnumerable<Project>> GetProjects(Repository repository, AzureDevOpsMetadata metadata)
+        private async Task<IEnumerable<AzureDevOpsProject>> GetProjects(Repository repository, AzureDevOpsMetadata metadata)
         {
-            List<Project> projects = new List<Project>();
+            List<AzureDevOpsProject> projects = new List<AzureDevOpsProject>();
             try
             {
-                var client = GetAzureDevopsHttpClient(metadata.PersonalAccessToken);
+                var client = GetAzureDevopsHttpClient(metadata);
 
                 using (HttpResponseMessage response = await client.GetAsync($"https://dev.azure.com/{repository.Name}/_apis/projects?api-version=5.1"))
                 {
                     response.EnsureSuccessStatusCode();
 
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    var itemsResponse = JsonConvert.DeserializeObject<ProjectsResponse>(responseBody);
+                    var itemsResponse = JsonConvert.DeserializeObject<AzureDevOpsProjectsResponse>(responseBody);
                     foreach (var project in itemsResponse.Projects)
                     {
                         projects.Add(project);
@@ -70,12 +70,12 @@ namespace SourceControl.AzureDevOps
             return projects;
         }
 
-        private async Task<IEnumerable<AzureDevOpsRepository>> GetRepositoriesFromProject(Repository repository, Project project, string personalAccessToken)
+        private async Task<IEnumerable<AzureDevOpsRepository>> GetRepositoriesFromProject(Repository repository, AzureDevOpsProject project, AzureDevOpsMetadata metadata)
         {
             List<AzureDevOpsRepository> repositories = new List<AzureDevOpsRepository>();
             try
             {
-                var client = GetAzureDevopsHttpClient(personalAccessToken);
+                var client = GetAzureDevopsHttpClient(metadata);
 
                 using (HttpResponseMessage response = await client.GetAsync($"https://dev.azure.com/{repository.Name}/{project.name}/_apis/git/repositories?api-version=5.1"))
                 {
@@ -96,25 +96,12 @@ namespace SourceControl.AzureDevOps
             }
             return repositories;
         }
-
-        private static HttpClient GetAzureDevopsHttpClient(string personalAccessToken)
-        {
-            var httpClient = new HttpClient();
-
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(
-                        System.Text.ASCIIEncoding.ASCII.GetBytes($":{personalAccessToken}")));
-            return httpClient;
-        }
-
         private async Task<IEnumerable<Item>> GetReadmeItemsFromRepository(Repository repository, AzureDevOpsRepository azureDevOpsRepo, AzureDevOpsMetadata metadata)
         {
             List<Item> readmeItems = new List<Item>();
             try
             {
-                var client = GetAzureDevopsHttpClient(metadata.PersonalAccessToken);
+                var client = GetAzureDevopsHttpClient(metadata);
                 using (HttpResponseMessage response = await client.GetAsync(
 $"https://dev.azure.com/{repository.Name}/{azureDevOpsRepo.project.name}/_apis/git/repositories/{azureDevOpsRepo.name}/items?recursionLevel=full&includeContentMetadata=true&latestProcessedChange=true&includeLinks=true&api-version=5.1").ConfigureAwait(false))
                 {
@@ -199,40 +186,16 @@ $"https://dev.azure.com/{repository.Name}/{azureDevOpsRepo.project.name}/_apis/g
             }
         }
 
-        public class Project
+        private static HttpClient GetAzureDevopsHttpClient(AzureDevOpsMetadata metadata)
         {
-            public string id { get; set; }
-            public string name { get; set; }
-            public string url { get; set; }
-            public string state { get; set; }
-            public int revision { get; set; }
-            public string visibility { get; set; }
-            public DateTime lastUpdateTime { get; set; }
-        }
+            var httpClient = new HttpClient();
 
-        public class ProjectsResponse
-        {
-            public int count { get; set; }
-            [JsonProperty("value")]
-            public List<Project> Projects { get; set; }
-        }
-
-        public class AzureDevOpsRepository
-        {
-            public string id { get; set; }
-            public string name { get; set; }
-            public string url { get; set; }
-            public Project project { get; set; }
-            public string remoteUrl { get; set; }
-            public string sshUrl { get; set; }
-            public string webUrl { get; set; }
-        }
-
-        public class AzureDevOpsRepositoryResponse
-        {
-            [JsonProperty("value")]
-            public List<AzureDevOpsRepository> repositories { get; set; }
-            public int count { get; set; }
+            httpClient.DefaultRequestHeaders.Accept.Add(
+                    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(
+                        System.Text.ASCIIEncoding.ASCII.GetBytes($":{metadata.PersonalAccessToken}")));
+            return httpClient;
         }
     }
 }
