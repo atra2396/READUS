@@ -14,6 +14,9 @@ namespace SourceControl.AzureDevOps
     public class AzureDevOpsSourceControlAccessor : ISourceControlAccessor
     {
         private static HttpClient DefaultHttpClient = new HttpClient();
+
+        private static HttpClient StreamHttpClient = new HttpClient();
+
         public async Task<IEnumerable<Document>> GetReadmes(Repository repository)
         {
             if (repository == null) throw new ArgumentException($"Received a null {typeof(Repository).Name} object as a parameter in {nameof(GetReadmes)} method.");
@@ -111,7 +114,7 @@ namespace SourceControl.AzureDevOps
                 HttpClient client = GetAzureDevopsHttpClient(metadata);
                 var responseBody = await client.GetStringAsync(
 $"https://dev.azure.com/{repository.Name}/{azureDevOpsRepo.project.name}/_apis/git/repositories/{azureDevOpsRepo.name}/items?recursionLevel=full&includeContentMetadata=true&latestProcessedChange=true&includeLinks=true&api-version=5.1").ConfigureAwait(false);
-                    var itemsResponse = JsonConvert.DeserializeObject<ItemsResponse>(responseBody);
+                var itemsResponse = JsonConvert.DeserializeObject<ItemsResponse>(responseBody);
                 foreach (var item in itemsResponse.Items)
                 {
                     if (item.path.EndsWith("readme.md", StringComparison.CurrentCultureIgnoreCase))
@@ -152,33 +155,26 @@ $"https://dev.azure.com/{repository.Name}/{azureDevOpsRepo.project.name}/_apis/g
         {
             try
             {
-                using (HttpClient client = new HttpClient())
+                var client = GetStreamAzureDevopsHttpClient(metadata);
+
+                using (var str = await client.GetStreamAsync(item.url).ConfigureAwait(false))
                 {
-                    client.DefaultRequestHeaders.Accept.Add(
-                        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
-
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                        Convert.ToBase64String(
-                            System.Text.ASCIIEncoding.ASCII.GetBytes($":{metadata.PersonalAccessToken}")));
-
-                    using (var str = await client.GetStreamAsync(item.url).ConfigureAwait(false))
+                    using (StreamReader reader = new StreamReader(str))
                     {
-                        using (StreamReader reader = new StreamReader(str))
+                        var readmeContent = reader.ReadToEnd();
+                        return new Document
                         {
-                            var readmeContent = reader.ReadToEnd();
-                            return new Document
-                            {
-                                Body = readmeContent,
-                                RepositoryId = repositoryId,
-                                Path = item.path,
-                                //TODO: Get these from AzureDevOps API response
-                                Created = DateTime.UtcNow,
-                                Updated = DateTime.UtcNow
-                            };
+                            Body = readmeContent,
+                            RepositoryId = repositoryId,
+                            Path = item.path,
+                            //TODO: Get these from AzureDevOps API response
+                            Created = DateTime.UtcNow,
+                            Updated = DateTime.UtcNow
+                        };
 
-                        }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -196,6 +192,18 @@ $"https://dev.azure.com/{repository.Name}/{azureDevOpsRepo.project.name}/_apis/g
                     Convert.ToBase64String(
                         System.Text.ASCIIEncoding.ASCII.GetBytes($":{metadata.PersonalAccessToken}")));
             return DefaultHttpClient;
+        }
+
+        private static HttpClient GetStreamAzureDevopsHttpClient(AzureDevOpsMetadata metadata)
+        {
+            StreamHttpClient.DefaultRequestHeaders.Accept.Add(
+                        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
+
+            StreamHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(
+                    System.Text.ASCIIEncoding.ASCII.GetBytes($":{metadata.PersonalAccessToken}")));
+
+            return StreamHttpClient;
         }
     }
 }
