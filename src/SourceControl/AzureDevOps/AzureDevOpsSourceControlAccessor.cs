@@ -1,11 +1,11 @@
 ﻿using DomainObjects;
 using Newtonsoft.Json;
+using SourceControl.AzureDevOps.POCOs;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SourceControl.AzureDevOps
@@ -120,29 +120,6 @@ $"https://dev.azure.com/{repository.OrganizationName}/{repository.ProjectName}/_
                 Console.WriteLine(ex);
                 return null;
             }
-        }
-
-        public class ItemsResponse
-        {
-            public int count { get; set; }
-            [JsonProperty("value")]
-            public List<Item> Items { get; set; }
-        }
-
-        public class Item
-        {
-            public string objectId { get; set; }
-            public string gitObjectType { get; set; }
-            public string commitId { get; set; }
-            public string path { get; set; }
-            public bool isFolder { get; set; }
-            public ContentMetadata contentMetadata { get; set; }
-            public string url { get; set; }
-        }
-
-        public class ContentMetadata
-        {
-            public string fileName { get; set; }
         }
     }
 }
