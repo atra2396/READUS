@@ -130,14 +130,6 @@ namespace READUS
 
             repos.Add(newRepo);
 
-            var newUser = new User()
-            {
-                Username = "agreen",
-                Password = "password"
-            };
-
-            users.Add(newUser);
-
             return new MemoryDataContext(docs, orgs, repos, users);
         }
     }

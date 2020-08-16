@@ -38,14 +38,16 @@ namespace READUS.Controllers
 
         // POST api/<controller>
         [AllowAnonymous]
-        [HttpPost("account")]
+        [HttpPost()]
         public IActionResult CreateAccount([FromBody]CreateAccountCommand account)
         {
             var user = this.dataContext.Users.GetWhere(x => x.Username == account.Username.Trim());
             if (user.Any())
                 return Conflict($"Username {account.Username} is already in use");
 
-            var newUser = new User { Username = account.Username, Password = account.Password }; // plain-text for now
+            var pass = new Password(account.Password);
+
+            var newUser = new User { Username = account.Username, Password = pass.CreatePasswordHash(this.cryptoSettings.Salt) };
             this.dataContext.Users.Add(newUser);
 
             return Ok(newUser.Id);
@@ -60,8 +62,10 @@ namespace READUS.Controllers
 
             var encryptedPassword = authRequest.Password + this.cryptoSettings.Salt;
 
+            var pass = new Password(authRequest.Password);
+
             var user = this.dataContext.Users
-                .GetWhere(x => x.Username == authRequest.Username && x.Password == encryptedPassword)
+                .GetWhere(x => x.Username == authRequest.Username && x.Password == pass.CreatePasswordHash(this.cryptoSettings.Salt))
                 .FirstOrDefault();
 
             if (user == null)
