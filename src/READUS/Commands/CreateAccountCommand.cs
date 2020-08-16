@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace READUS.Models
+namespace READUS.Commands
 {
-    public class CreateAccountRequest
+    public class CreateAccountCommand
     {
         public string Username { get; set; }
         public string Password { get; set; }
