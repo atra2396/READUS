@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using DomainObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using READUS.Commands;
+using READUS.Crypto;
 using READUS.Models;
 using Storage;
 
@@ -23,15 +26,19 @@ namespace READUS.Controllers
     public class UserAccountController : ControllerBase
     {
         IDataContext dataContext;
+        CryptoConfigs cryptoSettings;
+        JwtConfigs jwtSettings;
 
-        public UserAccountController(IDataContext dataContext)
+        public UserAccountController(IDataContext dataContext, IOptions<CryptoConfigs> cryptoSettings, IOptions<JwtConfigs> jwtSettings)
         {
             this.dataContext = dataContext;
+            this.cryptoSettings = cryptoSettings?.Value ?? throw new ArgumentNullException(nameof(cryptoSettings), "Crypto settings are required");
+            this.jwtSettings = jwtSettings?.Value ?? throw new ArgumentNullException(nameof(jwtSettings), "JWT settings are required");
         }
 
         // POST api/<controller>
-        [HttpPost("account")]
         [AllowAnonymous]
+        [HttpPost("account")]
         public IActionResult CreateAccount([FromBody]CreateAccountCommand account)
         {
             var user = this.dataContext.Users.GetWhere(x => x.Username == account.Username.Trim());
@@ -44,14 +51,14 @@ namespace READUS.Controllers
             return Ok(newUser.Id);
         }
 
-        [HttpPost("login")]
         [AllowAnonymous]
+        [HttpPost("login")]
         public IActionResult Login([FromBody]AuthRequest authRequest)
         {
             if (authRequest == null)
                 return BadRequest();
 
-            var encryptedPassword = authRequest.Password; // var encryptedPassword = SomeHash(authRequest.Password + salt)
+            var encryptedPassword = authRequest.Password + this.cryptoSettings.Salt;
 
             var user = this.dataContext.Users
                 .GetWhere(x => x.Username == authRequest.Username && x.Password == encryptedPassword)
@@ -78,7 +85,7 @@ namespace READUS.Controllers
         private string GenerateJwt(User user)
         {
             var jwtHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("this is the key that I will use for development");
+            var key = Encoding.UTF8.GetBytes(this.jwtSettings.SymmetricKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),

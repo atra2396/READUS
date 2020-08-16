@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using READUS.Crypto;
 using SourceControl.InMemory;
 using Storage;
 using System;
@@ -34,8 +36,13 @@ namespace READUS
             // if in dev
             services.AddSingleton<IDataContext, MemoryDataContext>(service => CreateMockdataContext());
 
-            services.AddControllersWithViews();
+            services.Configure<CryptoConfigs>(options => Configuration.GetSection("Crypto").Bind(options));
+            services.Configure<JwtConfigs>(options => Configuration.GetSection("JWT").Bind(options));
 
+            var jwtConfigs = new JwtConfigs();
+            Configuration.GetSection("JWT").Bind(jwtConfigs);
+
+            services.AddControllersWithViews();
             services.AddAuthentication(x => 
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -48,7 +55,7 @@ namespace READUS
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SUPER_SECURE_KEY)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfigs.SymmetricKey)),
                     ValidateIssuer = false, // false for development
                     ValidateAudience = false, // false for development
                     ClockSkew = TimeSpan.Zero
