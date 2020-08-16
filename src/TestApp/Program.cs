@@ -17,6 +17,7 @@ namespace TestApp
             var docs = new MemoryRepository<Document>();
             var repos = new MemoryRepository<Repository>();
             var orgs = new MemoryRepository<Organization>();
+            var users = new MemoryRepository<User>();
 
             var newOrg = new Organization()
             {
@@ -43,7 +44,7 @@ namespace TestApp
 
             repos.Add(newRepo);
 
-            var db = new MemoryDataContext(docs, orgs, repos);
+            var db = new MemoryDataContext(docs, orgs, repos, users);
 
             var queue = new MemoryQueue<RepositoryUpdatedMessage>();
 
