@@ -33,7 +33,7 @@ namespace SourceControl.GitHub
                     client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("product", "1"));
                     client.DefaultRequestHeaders.Add("Authorization", $"token {metadata.PersonalAccessToken}");
                     using (HttpResponseMessage response = await client.GetAsync(
-$"https://api.github.com/search/code?q=org:{repository.OrganizationName}+filename:readme").ConfigureAwait(false))
+$"https://api.github.com/search/code?q=org:{repository.Name}+filename:readme").ConfigureAwait(false))
                     {
                         response.EnsureSuccessStatusCode();
 
