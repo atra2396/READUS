@@ -4,6 +4,7 @@ using Queueing;
 using Queueing.Messages;
 using RepositoryScraper;
 using SourceControl.AzureDevOps;
+using SourceControl.GitHub;
 using SourceControl.InMemory;
 using Storage;
 using System;
@@ -30,20 +31,20 @@ namespace TestApp
             {
                 Created = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
-                Name = "zhekau",
+                Name = "evuru",
             };
             orgs.Add(newOrg);
 
             var metadata = new AzureDevOpsMetadata
             {
-                PersonalAccessToken = "dqqom4g5tcepdzkqs3xlzaoach3l7iljvwd2cdvftcieydlullyq",
+                PersonalAccessToken = "",
             };
 
             var newRepo = new Repository()
             {
                 Name = newOrg.Name,
                 OrganizationId = newOrg.Id,
-                SCM = SupportedSystems.AzureDevOps,
+                SCM = SupportedSystems.GitHub,
                 CustomRepositoryInformation = JsonConvert.SerializeObject(metadata)
             };
 
