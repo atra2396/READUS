@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SourceControl.InMemory
 {
@@ -15,7 +16,7 @@ namespace SourceControl.InMemory
 
         }
 
-        public IEnumerable<Document> GetReadmes(Repository repository)
+        public async Task<IEnumerable<Document>> GetReadmes(Repository repository)
         {
             var metadata =  JsonConvert.DeserializeObject<MemoryMetadata>(repository.CustomRepositoryInformation);
 

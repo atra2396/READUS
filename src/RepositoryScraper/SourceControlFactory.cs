@@ -1,5 +1,7 @@
 ﻿using DomainObjects;
 using SourceControl;
+using SourceControl.AzureDevOps;
+using SourceControl.GitHub;
 using SourceControl.InMemory;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,10 @@ namespace RepositoryScraper
             {
                 case SupportedSystems.Memory:
                     return new MemorySourceControlAccessor();
+                case SupportedSystems.AzureDevOps:
+                    return new AzureDevOpsSourceControlAccessor();
+                case SupportedSystems.GitHub:
+                    return new GitHubSourceControlAccessor();
                 default:
                     throw new NotSupportedException($"SCM {system.ToString()} is not yet supported");
             }
