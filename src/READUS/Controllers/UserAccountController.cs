@@ -39,7 +39,7 @@ namespace READUS.Controllers
         // POST api/<controller>
         [AllowAnonymous]
         [HttpPost()]
-        public IActionResult CreateAccount([FromBody]CreateAccountCommand account)
+        public ActionResult<Guid> CreateAccount([FromBody]CreateAccountCommand account)
         {
             var user = this.dataContext.Users.GetWhere(x => x.Username == account.Username.Trim());
             if (user.Any())
@@ -50,7 +50,7 @@ namespace READUS.Controllers
             var newUser = new User { Username = account.Username, Password = pass.CreatePasswordHash(this.cryptoSettings.Salt) };
             this.dataContext.Users.Add(newUser);
 
-            return Ok(newUser.Id);
+            return newUser.Id;
         }
 
         [AllowAnonymous]
@@ -69,7 +69,7 @@ namespace READUS.Controllers
                 .FirstOrDefault();
 
             if (user == null)
-                return BadRequest("Username or password is incorrect");
+                return Unauthorized("Username or password is incorrect");
 
             var token = GenerateJwt(user);
 
@@ -92,7 +92,7 @@ namespace READUS.Controllers
             var key = Encoding.UTF8.GetBytes(this.jwtSettings.SymmetricKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
+                Subject = new ClaimsIdentity(new[] { new Claim("user_id", user.Id.ToString()) }),
                 Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
