@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using READUS.Commands;
+using READUS.Models;
 using READUS.Crypto;
 using READUS.Models;
 using Storage;
@@ -39,7 +39,7 @@ namespace READUS.Controllers
         // POST api/<controller>
         [AllowAnonymous]
         [HttpPost()]
-        public ActionResult<Guid> CreateAccount([FromBody]CreateAccountCommand account)
+        public ActionResult<Guid> CreateAccount([FromBody]CreateAccountRequest account)
         {
             var user = this.dataContext.Users.GetWhere(x => x.Username == account.Username.Trim());
             if (user.Any())
@@ -55,7 +55,7 @@ namespace READUS.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login([FromBody]AuthRequest authRequest)
+        public IActionResult Login([FromBody]LoginRequest authRequest)
         {
             if (authRequest == null)
                 return BadRequest();

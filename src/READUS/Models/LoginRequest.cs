@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace READUS.Models
 {
-    public class AuthRequest
+    public class LoginRequest
     {
         [Required]
         public string Username { get; set; }

@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using READUS.Commands;
+using READUS.Models;
 using READUS.Controllers;
 using READUS.Crypto;
-using READUS.Models;
 using Storage;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,8 +38,8 @@ namespace ApiTests
             var controllerContext = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             this.userAccountController.ControllerContext = controllerContext;
 
-            var accountId = this.userAccountController.CreateAccount(new CreateAccountCommand { Username = "username", Password = "password@123" }).Value;
-            this.userAccountController.Login(new AuthRequest { Username = "username", Password = "password@123" });
+            var accountId = this.userAccountController.CreateAccount(new CreateAccountRequest { Username = "username", Password = "password@123" }).Value;
+            this.userAccountController.Login(new LoginRequest { Username = "username", Password = "password@123" });
 
             var responseHeaders = controllerContext.HttpContext.Response.Headers;
             Assert.IsTrue(responseHeaders.ContainsKey("Set-Cookie"));
@@ -55,8 +54,8 @@ namespace ApiTests
             var controllerContext = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             this.userAccountController.ControllerContext = controllerContext;
 
-            this.userAccountController.CreateAccount(new CreateAccountCommand { Username = "username", Password = "password@123" });
-            var result = this.userAccountController.Login(new AuthRequest { Username = "username", Password = "wrong_password" });
+            this.userAccountController.CreateAccount(new CreateAccountRequest { Username = "username", Password = "password@123" });
+            var result = this.userAccountController.Login(new LoginRequest { Username = "username", Password = "wrong_password" });
 
             Assert.IsNotNull(result as UnauthorizedObjectResult);
         }
