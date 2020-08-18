@@ -76,9 +76,9 @@ namespace READUS.Controllers
             var cookieOptions = new CookieOptions
             {
                 Domain = this.Request.Host.Host,
-                Expires = DateTimeOffset.Now.AddMinutes(5),
+                Expires = DateTimeOffset.Now.AddDays(jwtSettings.TokenLifetimeDays),
                 HttpOnly = true,
-                Secure = false // will be true for production usage
+                Secure = true
             };
 
             this.Response.Cookies.Append("Authorization", token, cookieOptions);

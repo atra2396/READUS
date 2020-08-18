@@ -8,5 +8,6 @@ namespace READUS.Crypto
     public class JwtConfigs
     {
         public string SymmetricKey { get; set; }
+        public int TokenLifetimeDays { get; set; }
     }
 }
