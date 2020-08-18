@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SourceControl
 {
     public interface ISourceControlAccessor
     {
-        IEnumerable<Document> GetReadmes(Repository repository);
+        Task<IEnumerable<Document>> GetReadmes(Repository repository);
     }
 }
